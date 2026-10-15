@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_insert_gps_devices
+      author: thiagxrg
+      comment: Seeds 3 test GPS devices (no HU manages this catalog via API).
+      changes:
+        - sqlFile:
+            path: 001_insert_gps_devices.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/02_dml/00_inserts/001_insert_gps_devices.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
