@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_add_fks_location
+      author: thiagxrg
+      comment: Adds location.gps_id -> gps.gps_id.
+      changes:
+        - sqlFile:
+            path: 001_add_fks_location.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/04_alter/001_add_fks_location.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
