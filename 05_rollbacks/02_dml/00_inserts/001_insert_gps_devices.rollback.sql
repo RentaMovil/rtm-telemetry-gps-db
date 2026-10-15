@@ -1,0 +1,1 @@
+DELETE FROM telemetry.gps WHERE serial IN ('GPS-TEST-001', 'GPS-TEST-002', 'GPS-TEST-003');

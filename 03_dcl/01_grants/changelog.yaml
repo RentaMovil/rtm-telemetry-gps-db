@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_grant_telemetry_schema_to_telemetry_app
+      author: thiagxrg
+      comment: Gives telemetry_app data access to the telemetry schema only.
+      changes:
+        - sqlFile:
+            path: 001_grant_telemetry_schema_to_telemetry_app.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/001_grant_telemetry_schema_to_telemetry_app.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+
+  - changeSet:
+      id: 002_grant_insert_audit_to_telemetry_app
+      author: thiagxrg
+      comment: Lets telemetry_app append to shared.audit (created by rtm-iam-db, which migrates first).
+      changes:
+        - sqlFile:
+            path: 002_grant_insert_audit_to_telemetry_app.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/03_dcl/01_grants/002_grant_insert_audit_to_telemetry_app.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false

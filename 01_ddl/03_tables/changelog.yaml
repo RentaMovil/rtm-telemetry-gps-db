@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_create_table_gps
+      author: thiagxrg
+      comment: Creates telemetry.gps.
+      changes:
+        - sqlFile:
+            path: 001_create_table_gps.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/03_tables/001_create_table_gps.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
+
+  - changeSet:
+      id: 002_create_table_location
+      author: thiagxrg
+      comment: Creates telemetry.location, with its FK to telemetry.gps (same migration run).
+      changes:
+        - sqlFile:
+            path: 002_create_table_location.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/03_tables/002_create_table_location.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
