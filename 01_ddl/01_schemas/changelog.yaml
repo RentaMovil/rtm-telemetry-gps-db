@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_create_schema_telemetry
+      author: thiagxrg
+      comment: Creates the telemetry schema.
+      changes:
+        - sqlFile:
+            path: 001_create_schema_telemetry.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/01_ddl/01_schemas/001_create_schema_telemetry.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
