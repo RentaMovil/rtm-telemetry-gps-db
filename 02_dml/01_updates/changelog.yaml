@@ -1,1 +1,18 @@
-databaseChangeLog: []
+databaseChangeLog:
+  - changeSet:
+      id: 001_deactivate_unused_test_devices
+      author: thiagxrg
+      comment: >-
+        GPS-TEST-002 y GPS-TEST-003 no corresponden a ningún dispositivo físico real; se
+        desactivan para que no aparezcan como opciones en el selector del admin al registrar
+        un pickup.
+      changes:
+        - sqlFile:
+            path: 001_deactivate_unused_test_devices.sql
+            relativeToChangelogFile: true
+            stripComments: false
+      rollback:
+        - sqlFile:
+            path: ../../05_rollbacks/02_dml/01_updates/001_deactivate_unused_test_devices.rollback.sql
+            relativeToChangelogFile: true
+            stripComments: false
