@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+jobs:
+  validate-migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repo
+        uses: actions/checkout@v4
+        with:
+          path: own
+
+      # This repo's own compose file doesn't start SQL Server: in a real deploy it connects to
+      # the "sqlserver" container started by rtm-iam-db. Same here, so this repo's migrations
+      # have a database to run against.
+      - name: Check out rtm-iam-db (starts the shared SQL Server)
+        uses: actions/checkout@v4
+        with:
+          repository: RentaMovil/rtm-iam-db
+          path: rtm-iam-db
+
+      - name: Create the shared Docker network
+        run: docker network create rentamovil
+
+      - name: Start SQL Server and apply iam's migrations
+        working-directory: rtm-iam-db
+        env:
+          MSSQL_SA_PASSWORD: "CiOnly_${{ github.run_id }}!"
+          IAM_APP_PASSWORD: "CiOnly_App123!"
+        run: docker compose up --build --abort-on-container-exit --exit-code-from migrations
+
+      # If a changeset here is broken (bad SQL, a missing rollback, a changelog that doesn't
+      # parse) this job fails before merge instead of only being discovered on the VPS.
+      - name: Apply this repo's Liquibase migrations
+        working-directory: own
+        env:
+          MSSQL_SA_PASSWORD: "CiOnly_${{ github.run_id }}!"
+          FLEET_APP_PASSWORD: "CiOnly_App123!"
+          TELEMETRY_APP_PASSWORD: "CiOnly_App123!"
+        run: docker compose up --build --abort-on-container-exit --exit-code-from migrations
