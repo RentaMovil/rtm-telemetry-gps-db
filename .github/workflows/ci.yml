@@ -26,15 +26,27 @@ jobs:
       - name: Create the shared Docker network
         run: docker network create rentamovil
 
+      # Detached, not --abort-on-container-exit: that flag stops the WHOLE compose project
+      # (including the long-running sqlserver container) the moment the one-shot "migrations"
+      # container exits, which would leave this repo's own migrations with no database to
+      # connect to. So instead: start everything detached, wait only for "migrations" to finish,
+      # and read its exit code -- sqlserver keeps running for the next step.
       - name: Start SQL Server and apply iam's migrations
         working-directory: rtm-iam-db
         env:
           MSSQL_SA_PASSWORD: "CiOnly_${{ github.run_id }}!"
           IAM_APP_PASSWORD: "CiOnly_App123!"
-        run: docker compose up --build --abort-on-container-exit --exit-code-from migrations
+        run: |
+          docker compose up -d --build
+          cid=$(docker compose ps -q migrations)
+          docker wait "$cid"
+          docker compose logs migrations
+          exit "$(docker inspect "$cid" --format='{{.State.ExitCode}}')"
 
       # If a changeset here is broken (bad SQL, a missing rollback, a changelog that doesn't
-      # parse) this job fails before merge instead of only being discovered on the VPS.
+      # parse) this job fails before merge instead of only being discovered on the VPS. This is
+      # the last step, nothing else needs the database afterward, so abort-on-container-exit is
+      # fine here.
       - name: Apply this repo's Liquibase migrations
         working-directory: own
         env:
